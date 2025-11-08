@@ -61,13 +61,42 @@ class Obsidian():
 
         return self._safe_call(call_fn)
 
-    def get_file_contents(self, filepath: str) -> Any:
+    def get_file_contents(self, filepath: str, content_type: str = 'markdown') -> Any:
+        """Get file contents from vault.
+
+        Args:
+            filepath: Path to the file (relative to vault root)
+            content_type: Content type to retrieve ('markdown', 'json', or 'html')
+                - 'markdown': Raw markdown content (default)
+                - 'json': JSON metadata with parsed frontmatter and tags
+                - 'html': Rendered HTML from markdown
+
+        Returns:
+            File content in the requested format
+        """
         url = f"{self.get_base_url()}/vault/{filepath}"
-    
+
+        # Map content type to Accept header
+        accept_headers = {
+            'markdown': 'text/markdown',
+            'json': 'application/vnd.olrapi.note+json',
+            'html': 'application/vnd.olrapi.note+html'
+        }
+
+        if content_type not in accept_headers:
+            raise ValueError(f"Invalid content_type: {content_type}. Must be one of: {', '.join(accept_headers.keys())}")
+
+        headers = self._get_headers()
+        headers['Accept'] = accept_headers[content_type]
+
         def call_fn():
-            response = requests.get(url, headers=self._get_headers(), verify=self.verify_ssl, timeout=self.timeout)
+            response = requests.get(url, headers=headers, verify=self.verify_ssl, timeout=self.timeout)
             response.raise_for_status()
-            
+
+            # For JSON content type, parse and return as dict
+            if content_type == 'json':
+                return response.json()
+
             return response.text
 
         return self._safe_call(call_fn)

@@ -98,7 +98,7 @@ class GetFileContentsToolHandler(ToolHandler):
     def get_tool_description(self):
         return Tool(
             name=self.name,
-            description="Return the content of a single file in your vault.",
+            description="Return the content of a single file in your vault. Supports multiple content formats.",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -106,6 +106,12 @@ class GetFileContentsToolHandler(ToolHandler):
                         "type": "string",
                         "description": "Path to the relevant file (relative to your vault root).",
                         "format": "path"
+                    },
+                    "content_type": {
+                        "type": "string",
+                        "description": "Content format to retrieve: 'markdown' (raw markdown, default), 'json' (metadata with frontmatter and tags), or 'html' (rendered HTML from markdown)",
+                        "enum": ["markdown", "json", "html"],
+                        "default": "markdown"
                     },
                 },
                 "required": ["filepath"]
@@ -116,14 +122,23 @@ class GetFileContentsToolHandler(ToolHandler):
         if "filepath" not in args:
             raise RuntimeError("filepath argument missing in arguments")
 
+        content_type = args.get("content_type", "markdown")
+
         api = obsidian.Obsidian(api_key=api_key, host=obsidian_host)
 
-        content = api.get_file_contents(args["filepath"])
+        content = api.get_file_contents(args["filepath"], content_type)
+
+        # For JSON content type, content is already a dict, so stringify it
+        # For markdown and html, content is a string
+        if isinstance(content, dict):
+            text = json.dumps(content, indent=2)
+        else:
+            text = content
 
         return [
             TextContent(
                 type="text",
-                text=json.dumps(content, indent=2)
+                text=text
             )
         ]
     
