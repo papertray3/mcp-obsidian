@@ -1,0 +1,80 @@
+name: papertray3-custom
+displayName: papertray3-custom
+registry:
+  obsidian-html:
+    dateAdded: "2025-11-08T00:00:00Z"
+    description: Enhanced MCP server for Obsidian with HTML rendering support. Interact with your Obsidian vault via the Obsidian Local REST API plugin. Get file contents as markdown, JSON metadata, or fully-rendered HTML.
+    icon: https://obsidian.md/favicon.svg
+    image: mcp/obsidian:latest
+    command:
+      - --transport=stdio
+    config:
+      - description: Configure connection to Obsidian REST API
+        name: obsidian
+        properties:
+          api_key:
+            type: string
+            description: API key from Obsidian Local REST API plugin settings
+          host:
+            type: string
+            description: Hostname for the Obsidian REST API (use host.docker.internal for local)
+            default: host.docker.internal
+        required:
+          - api_key
+        type: object
+    metadata:
+      category: productivity
+      license: MIT
+      owner: papertray3
+      tags:
+        - obsidian
+        - notes
+        - knowledge-management
+        - markdown
+        - html-rendering
+    prompts: 0
+    readme: https://raw.githubusercontent.com/papertray3/mcp-obsidian/main/README.md
+    ref: ""
+    resources: {}
+    secrets:
+      - env: OBSIDIAN_API_KEY
+        example: your_api_key_from_obsidian_plugin
+        name: obsidian.api_key
+      - env: OBSIDIAN_HOST
+        example: host.docker.internal
+        name: OBSIDIAN_HOST
+    source: https://github.com/papertray3/mcp-obsidian
+    title: Obsidian (Enhanced with HTML Rendering)
+    tools:
+      - name: obsidian_list_files_in_vault
+        description: List all files and directories in the vault
+      - name: obsidian_get_file_contents
+        description: Get file contents in markdown, JSON, or HTML format
+        parameters:
+          properties:
+            filepath:
+              description: Path to the file relative to vault root
+              type: string
+            content_type:
+              description: Format to retrieve - markdown (raw), json (metadata), or html (rendered)
+              type: string
+              enum:
+                - markdown
+                - json
+                - html
+              default: markdown
+          required:
+            - filepath
+          type: object
+      - name: obsidian_create_note
+        description: Create a new note in the vault
+      - name: obsidian_update_note
+        description: Update an existing note
+      - name: obsidian_delete_file
+        description: Delete a file from the vault
+      - name: obsidian_search_vault
+        description: Search for content in the vault
+      - name: obsidian_get_active_file
+        description: Get the currently active file in Obsidian
+    type: server
+    upstream: https://github.com/papertray3/mcp-obsidian

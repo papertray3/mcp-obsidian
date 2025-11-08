@@ -118,6 +118,39 @@ On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
 ```
 </details>
 
+## Docker MCP Catalog
+
+This repository includes a custom MCP catalog that you can import into Docker Desktop to use the enhanced Obsidian MCP server with HTML rendering support.
+
+### Quick Start with Docker MCP
+
+1. **Import the catalog:**
+```bash
+docker mcp catalog import https://raw.githubusercontent.com/papertray3/mcp-obsidian/main/papertray3-catalog.yaml
+```
+
+2. **Add the server from the catalog:**
+```bash
+docker mcp server add obsidian-html
+```
+
+3. **Configure your secrets:**
+```bash
+docker mcp secret set OBSIDIAN_API_KEY=<your_api_key>
+docker mcp secret set OBSIDIAN_HOST=host.docker.internal
+```
+
+4. **Verify it's enabled:**
+```bash
+docker mcp server ls
+```
+
+The server will now be available to all MCP clients connected to Docker MCP Gateway (like Claude Code).
+
+### Using a Local Image
+
+If you've built the Docker image locally and tagged it as `mcp/obsidian:latest`, Docker Desktop will use your local version instead of pulling from a registry. This is useful for testing changes before publishing.
+
 ## Development
 
 ### Building
